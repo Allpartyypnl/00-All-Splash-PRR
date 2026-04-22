@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KK // COLD-BOOT</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;600&family=JetBrains+Mono&display=swap');
+
+        :root {
+            --primary: #bc00ff;
+            --secondary: #00f2ff;
+            --bg: #030008;
+            --glass: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            transition: opacity 0.5s ease;
+        }
+
+        /* --- Ambient Orbs --- */
+        .orb {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.3;
+            animation: float 10s infinite alternate ease-in-out;
+        }
+        .orb-1 { background: var(--primary); top: -5%; left: -5%; }
+        .orb-2 { background: var(--secondary); bottom: -5%; right: -5%; animation-delay: -3s; }
+
+        @keyframes float {
+            from { transform: translate(0, 0); }
+            to { transform: translate(40px, 40px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 88vw;
+            max-width: 360px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 30px;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            letter-spacing: 5px;
+            font-weight: 1000;
+            margin-bottom: 30px;
+            opacity: 1.0;
+        }
+
+        .visual-core {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .svg-ring {
+            position: absolute;
+            transform: rotate(-90deg);
+        }
+
+        .circle-bg { fill: none; stroke: rgba(255,255,255,0.03); stroke-width: 6; }
+        .circle-fill {
+            fill: none;
+            stroke: url(#gradient);
+            stroke-width: 6;
+            stroke-linecap: round;
+            stroke-dasharray: 440;
+            stroke-dashoffset: 440;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        .percentage {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.2rem;
+            font-weight: 600;
+        }
+
+        .log-box {
+            height: 70px;
+            overflow: hidden;
+            margin-bottom: 25px;
+            maKK-image: linear-gradient(to bottom, transparent, black 30%, black 70%, transparent);
+        }
+
+        .log-line {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            color: var(--secondary);
+            margin: 5px 0;
+            text-transform: uppercase;
+            animation: slideIn 0.2s ease-out forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 0.7; }
+        }
+
+        .status-pill {
+            display: inline-block;
+            padding: 8px 22px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.4s ease;
+        }
+
+        .status-pill.complete {
+            background: #fff;
+            color: #000;
+            box-shadow: 0 0 25px #fff;
+            transform: scale(1.05);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1>KK PANEL</h1>
+        </div>
+
+        <div class="visual-core">
+            <svg class="svg-ring" width="150" height="150">
+                <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#bc00ff" />
+                        <stop offset="100%" stop-color="#00f2ff" />
+                    </linearGradient>
+                </defs>
+                <circle class="circle-bg" cx="75" cy="75" r="70"></circle>
+                <circle class="circle-fill" id="ring" cx="75" cy="75" r="70"></circle>
+            </svg>
+            <div class="percentage" id="pct">0%</div>
+        </div>
+
+        <div class="log-box" id="log"></div>
+
+        <div class="status-pill" id="st">COLD BOOT</div>
+    </div>
+
+    <script>
+        const script = [
+            {t: '> initializing cold-boot…', s: 'handshake'},
+            {t: '> decrypting volume…', s: 'AES-256-XTS'},
+            {t: '> loading kernel…', s: 'alex.os/v2.1'},
+            {t: '> establishing link…', s: '12 active'},
+            {t: '> mounting partition…', s: 'admin'},
+            {t: '> system ready', s: 'READY'}
+        ];
+
+        const logCont = document.getElementById('log');
+        const pctText = document.getElementById('pct');
+        const ring = document.getElementById('ring');
+        const stCont = document.getElementById('st');
+
+        let progress = 0;
+        let lineIdx = 0;
+        const totalDash = 440;
+        const duration = 2000; // 2 Seconds
+        const interval = 20; 
+        const step = 100 / (duration / interval); 
+
+        function update() {
+            if (progress <= 100) {
+                pctText.innerText = Math.floor(progress) + "%";
+                ring.style.strokeDashoffset = totalDash - (progress / 100) * totalDash;
+
+                const trigger = Math.floor((100 / script.length) * (lineIdx + 1));
+                if (progress >= trigger && lineIdx < script.length) {
+                    const div = document.createElement('div');
+                    div.className = 'log-line';
+                    div.innerText = script[lineIdx].t;
+                    logCont.appendChild(div);
+                    stCont.innerText = script[lineIdx].s;
+                    if (logCont.childNodes.length > 2) logCont.removeChild(logCont.firstChild);
+                    lineIdx++;
+                }
+
+                progress += step;
+                setTimeout(update, interval);
+            } else {
+                finish();
+            }
+        }
+
+        function finish() {
+            pctText.innerText = "100%";
+            ring.style.strokeDashoffset = 0;
+            stCont.innerText = "ACCESS GRANTED";
+            stCont.classList.add('complete');
+
+            // --- Automatic Redirect Logic ---
+            setTimeout(() => {
+                document.body.style.opacity = '0'; // Fade out effect
+                setTimeout(() => {
+                    window.location.href = 'main-panel.html'; // Adjust this filename to your next page
+                }, 500);
+            }, 800);
+        }
+
+        setTimeout(update, 400); // Initial delay
+    </script>
+</body>
+</html>
